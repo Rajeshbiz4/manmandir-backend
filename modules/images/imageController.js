@@ -11,28 +11,34 @@ var ObjectID = require("mongodb").ObjectID;
 
 // Create new user
 router.post("/create", function (req, res) {
-  myLogModule.info("ImageController API-Branch(user/create)", req.body);
+  myLogModule.info("ImageController API-images(user/create)", req.body);
   MongoClient.connect(
     url,
     { useNewUrlParser: true, useUnifiedTopology: true },
     function (err, db) {
       if (err) throw err;
       myLogModule.info("payload -- " + JSON.stringify(req.body));
-      if (!req.body.name) {
+      if (
+        !req.body.title ||
+        !req.body.type ||
+        !req.body.desc ||
+        !req.body.image
+      ) {
         return res.status(400).json({ error: "Missing required fields" });
       }
       var dbo = db.db("manmandir");
       var payload = {
-        name: req.body.name,
-        owner: req.body.owner,
-        Address: req.body.Address,
-        start_date: new Date(),
+        title: req.body.title,
+        type: req.body.type,
+        desc: req.body.desc,
+        weight: req.body.weight,
+        image: req.body.image, // base 64
         created_at: new Date(),
         updated_at: new Date()
       };
       myLogModule.info("payload -- " + JSON.stringify(payload));
       var myobj = payload;
-      dbo.collection("branch").insertOne(myobj, function (err, result) {
+      dbo.collection("images").insertOne(myobj, function (err, result) {
         if (err) {
           myLogModule.error("error", err);
           res.status(400).send({ message: "error", data: err });
@@ -74,20 +80,20 @@ router.get("/list", function (req, res) {
       var dbo = db.db("manmandir");
 
       dbo
-        .collection("branch")
+        .collection("images")
         .find({})
         .count(function (err, count) {
           if (err) {
             console.log("Error while fatching count");
           } else {
             dbo
-              .collection("branch")
+              .collection("images")
               .find({}, query)
               .toArray(function (err, result) {
                 if (err) throw err;
                 if (result) {
                   myLogModule.info(
-                    "ImageController - Branch list fetched sucessfully"
+                    "ImageController - images list fetched sucessfully"
                   );
                   res.status(200).json({
                     data: result,
@@ -108,7 +114,7 @@ router.get("/list", function (req, res) {
 
 // Update one document
 router.put("/update", function (req, res) {
-  myLogModule.info("ImageController API-(Branch/update)");
+  myLogModule.info("ImageController API-(images/update)");
   MongoClient.connect(
     url,
     {
@@ -126,7 +132,7 @@ router.put("/update", function (req, res) {
       var myquery = payload;
       var newvalues = { $set: { firstName: "updated" } };
       dbo
-        .collection("branch")
+        .collection("images")
         .updateOne(myquery, newvalues, function (err, result) {
           if (err) throw err;
           myLogModule.info("User update sucessfully");
@@ -163,7 +169,7 @@ router.delete("/delete", function (req, res) {
       var myquery = payload;
       var newvalues = { $set: { name: "YO Rajesh" } };
       dbo
-        .collection("branch")
+        .collection("images")
         .deleteOne(myquery, newvalues, function (err, result) {
           if (err) throw err;
           myLogModule.info("ImageController deleted sucessfully");
