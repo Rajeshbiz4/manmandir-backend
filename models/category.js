@@ -3,18 +3,16 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 // create a schema
-var customerSchema = new Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  mobile: { type: String, required: true },
-  Address: { type: String },
+var categorySchema = new Schema({
+  title: { type: String, required: true },
+  imageUrl: { type: String, required: true },
   created_at: Date,
   updated_at: Date
 });
 
 // the schema is useless so far
 // we need to create a model using it
-var customer = mongoose.model("customer", customerSchema);
+var category = mongoose.model("category", categorySchema);
 
 // make this available to our users in our Node applications
-module.exports = customer;
+module.exports = category;
